@@ -1,0 +1,18 @@
+# Sensitive files
+*.key
+*.pem
+id_rsa
+id_ed25519
+.env*
+secrets*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary
+*.tmp
+*.swp
