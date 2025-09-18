@@ -118,6 +118,8 @@ source $ZSH/oh-my-zsh.sh
 
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 source /Users/tommy/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+bindkey "^k" forward-word
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -142,3 +144,8 @@ alias taskmaster='task-master'
 alias vim="nvim"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+
+bindkey "^k" forward-word
