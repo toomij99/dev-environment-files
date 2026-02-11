@@ -85,6 +85,19 @@ Personal dotfiles configuration for Zsh, Tmux, Neovim, and Git.
    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
    ```
 
+## Directory Structure
+
+```
+~/.dotfiles/
+├── .config/
+│   └── nvim/       # Neovim configuration (symlinks to ~/.config/nvim)
+├── tmux.conf       # Tmux configuration (symlinks to ~/.tmux.conf)  
+├── zshrc           # Zsh configuration (symlinks to ~/.zshrc)
+├── gitconfig       # Git configuration (symlinks to ~/.gitconfig)
+├── README.md       # This file
+└── .stow-local-ignore
+```
+
 ## Installation
 
 1. Clone this repository:
@@ -95,7 +108,14 @@ Personal dotfiles configuration for Zsh, Tmux, Neovim, and Git.
 
 2. Stow the configurations:
    ```bash
+   # Stow all configurations
    stow .
+   
+   # Or stow individual configurations selectively
+   stow .config      # nvim only (creates ~/.config/nvim)
+   stow tmux.conf    # tmux only (creates ~/.tmux.conf)
+   stow zshrc        # zsh only (creates ~/.zshrc)
+   stow gitconfig    # git config only (creates ~/.gitconfig)
    ```
 
 3. Restart your terminal or source the configurations.
