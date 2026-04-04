@@ -82,6 +82,11 @@ return {
       })
     end
 
+    -- Only use new LSP config API for neovim 0.10+
+    if not has_lsp_config then
+      return
+    end
+
     vim.lsp.config("svelte", {
       on_attach = function(client, bufnr)
         vim.api.nvim_create_autocmd("BufWritePost", {
