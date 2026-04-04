@@ -168,7 +168,7 @@ do_install() {
             install_packages_brew
             ;;
         linux-apt)
-            if command -v brew &> /dev/null; then
+            if command -v brew &> /dev/null 2>&1; then
                 print_info "Homebrew detected"
                 install_packages_brew
             else
@@ -177,8 +177,11 @@ do_install() {
             fi
             ;;
         linux-dnf|linux-arch)
-            install_brew || true
-            install_packages_brew || true
+            if command -v brew &> /dev/null 2>&1; then
+                install_packages_brew
+            else
+                print_warning "Using native package manager..."
+            fi
             ;;
         *)
             print_warning "Unknown OS, trying to install packages anyway..."
