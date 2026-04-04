@@ -217,6 +217,17 @@ do_install() {
     stow .
     print_success "Dotfiles stowed"
 
+    print_header "Configuring Powerlevel10k"
+    print_info "Run 'p10k configure' to customize your prompt"
+    print_info "Or press any key to skip..."
+
+    if [ -t 0 ]; then
+        read -t 10 -r "p10k_configure" || true
+        if [ -n "$p10k_configure" ]; then
+            p10k configure
+        fi
+    fi
+
     print_info "Setting zsh as default shell..."
     ZSH_PATH="$(command -v zsh 2>/dev/null || echo "/usr/bin/zsh")"
     if [ -x "$ZSH_PATH" ]; then
