@@ -1,6 +1,7 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 if [ "$TMUX" = "" ]; then
   eval $(ssh-agent -s)
@@ -155,9 +156,13 @@ alias vim="nvim"
 export PATH="$HOME/.local/bin:$PATH"
 
 # Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
-
-bindkey "^k" forward-word
+if command -v fzf &> /dev/null; then
+    if command -v fzf-share &> /dev/null; then
+        source "$(fzf-share)/key-bindings.zsh"
+    elif [ -f "/usr/share/fzf/key-bindings.zsh" ]; then
+        source "/usr/share/fzf/key-bindings.zsh"
+    fi
+fi
 
 # -- Use fd instead of fzf --
 
