@@ -2,125 +2,39 @@
 
 Personal dotfiles configuration for Zsh, Tmux, Neovim, and Git.
 
-## Prerequisites
+## Quick Install
 
-### macOS
+One-command install on macOS or Linux:
 
-1. Install Homebrew:
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-2. Install required packages:
-   ```bash
-   brew install zsh git tmux neovim stow fzf bat thefuck yazi zoxide
-   ```
-
-3. Install Oh My Zsh:
-   ```bash
-   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-   ```
-
-4. Install Powerlevel10k theme:
-   ```bash
-   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-   ```
-
-5. Install Tmux Plugin Manager (TPM):
-   ```bash
-   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-   ```
-
-### Ubuntu/Debian
-
-1. Install Homebrew:
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-2. Install required packages:
-   ```bash
-   brew install zsh git tmux neovim stow fzf bat thefuck yazi zoxide
-   ```
-
-3. Install Oh My Zsh:
-   ```bash
-   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-   ```
-
-4. Install Powerlevel10k theme:
-   ```bash
-   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-   ```
-
-5. Install Tmux Plugin Manager (TPM):
-   ```bash
-   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-   ```
-
-### Ubuntu/Debian (Alternative with apt)
-
-1. Install Homebrew:
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-2. Install required packages:
-   ```bash
-   brew install zsh git tmux neovim stow fzf bat thefuck yazi zoxide
-   ```
-
-3. Install Oh My Zsh:
-   ```bash
-   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-   ```
-
-4. Install Powerlevel10k theme:
-   ```bash
-   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-   ```
-
-5. Install Tmux Plugin Manager (TPM):
-   ```bash
-   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-   ```
-
-## Directory Structure
-
-```
-~/.dotfiles/
-├── .config/
-│   └── nvim/       # Neovim configuration (symlinks to ~/.config/nvim)
-├── tmux.conf       # Tmux configuration (symlinks to ~/.tmux.conf)  
-├── zshrc           # Zsh configuration (symlinks to ~/.zshrc)
-├── gitconfig       # Git configuration (symlinks to ~/.gitconfig)
-├── README.md       # This file
-└── .stow-local-ignore
+```bash
+curl -sS https://raw.githubusercontent.com/toomij99/dev-environment-files/main/install.sh | bash
 ```
 
-## Installation
+### Options
 
-1. Clone this repository:
+| Command | Description |
+|---------|-------------|
+| `curl ... \| bash` | Fresh install (default) |
+| `curl ... \| bash -s -- --update` | Update dotfiles |
+| `curl ... \| bash -s -- --fix` | Re-stow configurations |
+| `curl ... \| bash -s -- --help` | Show help |
+
+## Manual Install
+
+1. Clone repository:
    ```bash
-   git clone git@github.com:toomij99/dev-environment-files.git ~/.dotfiles
+   git clone --recurse-submodules git@github.com:toomij99/dev-environment-files.git ~/.dotfiles
    cd ~/.dotfiles
    ```
 
-2. Stow the configurations:
+2. Stow configurations:
    ```bash
-   # Stow all configurations
    stow .
-   
-   # Or stow individual configurations selectively
-   stow .config      # nvim only (creates ~/.config/nvim)
-   stow tmux.conf    # tmux only (creates ~/.tmux.conf)
-   stow zshrc        # zsh only (creates ~/.zshrc)
-   stow gitconfig    # git config only (creates ~/.gitconfig)
    ```
 
-3. Restart your terminal or source the configurations.
+3. Restart terminal.
 
-4. For Tmux plugins, press `prefix + I` (default prefix is Ctrl-a) to install plugins.
+4. Install Tmux plugins: `Ctrl-a I`
 
 ## Features
 
