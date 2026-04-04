@@ -245,6 +245,19 @@ do_install() {
     fi
 
     cd "$DOTFILES_DIR"
+    
+    print_info "Backing up existing dotfiles..."
+    for f in zshrc tmux.conf gitconfig; do
+        if [ -f "$HOME/.$f" ] && [ ! -L "$HOME/.$f" ]; then
+            mv "$HOME/.$f" "$HOME/.$f.bak.$(date +%s)"
+            print_info "Backed up .$f"
+        fi
+    done
+    if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
+        mv "$HOME/.config/nvim" "$HOME/.config/nvim.bak.$(date +%s)"
+        print_info "Backed up .config/nvim"
+    fi
+    
     stow .
     print_success "Dotfiles stowed"
 
