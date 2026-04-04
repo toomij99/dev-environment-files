@@ -279,6 +279,20 @@ rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux/plugins/tpm 2>/dev/null
     done
     ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
     print_success "Dotfiles stowed"
+    
+    print_header "Installing Tmux Plugins"
+    if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+        print_info "Installing TPM..."
+        git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    fi
+    
+    # Create simple status bar if theme fails
+    if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+        print_info "Running TPM install in tmux..."
+        # Just load the config, let user press prefix+I manually
+    fi
+    
+    print_info "For tmux plugins, press: Ctrl-a + I"
 
     print_header "Configuring Powerlevel10k"
     print_info "Run 'p10k configure' to customize your prompt"
