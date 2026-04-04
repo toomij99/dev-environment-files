@@ -16,7 +16,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:/opt/homebrew/opt:/Library/TeX/texbin$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
+if command -v brew &> /dev/null; then
+    export PATH=$HOME/bin:/usr/local/bin:$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -117,24 +119,33 @@ source $ZSH/oh-my-zsh.sh
  alias zshconfig="vim ~/.zshrc"
 
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-source $ZSH/custom/plugins/zsh-autosuggestions
+if [ -f "$ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh" ]; then
+    source $ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
+fi
 
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+if [ -f "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+    source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+elif [ -f "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+    source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+if [ -d "$HOME/Library/Python/3.9/bin" ]; then
+    export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=($HOME/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
+# Docker CLI completions (optional)
+if [ -d "$HOME/.docker/completions" ]; then
+    fpath=($HOME/.docker/completions $fpath)
+    autoload -Uz compinit
+    compinit
+fi
 
 # Task Master aliases added on 6/22/2025
 alias tm='task-master'
