@@ -2,6 +2,24 @@
 
 Personal dotfiles configuration for Zsh, Tmux, Neovim, and Git.
 
+## Required: Install Nerd Fonts
+
+To see icons in tmux/neovim, install a Nerd Font:
+
+**macOS:**
+```bash
+brew install font-sf-mono
+# Or: brew install --cask font-hack-nerd-font
+```
+
+**Linux:**
+```bash
+# Download: https://www.nerdfonts.com/font-downloads
+# Or: sudo apt install fonts-firacode
+```
+
+Then set terminal font to the Nerd Font in your terminal settings.
+
 ## Quick Install
 
 One-command install on macOS or Linux:
