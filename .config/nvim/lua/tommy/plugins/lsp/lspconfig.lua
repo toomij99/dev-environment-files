@@ -74,9 +74,13 @@ return {
       },
     })
 
-    vim.lsp.config("*", {
-      capabilities = capabilities,
-    })
+    -- Check neovim version for LSP config API
+    local has_lsp_config = vim.fn.has("nvim-0.10") == 1
+    if has_lsp_config then
+      vim.lsp.config("*", {
+        capabilities = capabilities,
+      })
+    end
 
     vim.lsp.config("svelte", {
       on_attach = function(client, bufnr)
