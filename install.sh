@@ -309,6 +309,14 @@ rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux/plugins/tpm 2>/dev/null
     else
         print_warning "zsh not found"
     fi
+    
+    # Fallback: add exec zsh to bashrc
+    if [ -f "$HOME/.bashrc" ]; then
+        if ! grep -q "exec zsh" "$HOME/.bashrc" 2>/dev/null; then
+            echo "exec zsh -l" >> "$HOME/.bashrc"
+            print_info "Added 'exec zsh' to .bashrc"
+        fi
+    fi
 }
 
 do_update() {
