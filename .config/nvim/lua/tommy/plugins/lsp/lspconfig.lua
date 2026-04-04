@@ -7,6 +7,12 @@ return {
     { "folke/neodev.nvim", opts = {} },
   },
   config = function()
+    -- Skip entirely on neovim < 0.10 (LSP config API doesn't exist)
+    if vim.fn.has("nvim-0.10") == 0 then
+      vim.notify("nvim-lspconfig: requires neovim 0.10+", vim.log.levels.WARN)
+      return
+    end
+    
     -- import cmp-nvim-lsp plugin
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
@@ -76,16 +82,9 @@ return {
 
     -- Check neovim version for LSP config API
     local has_lsp_config = vim.fn.has("nvim-0.10") == 1
-    if has_lsp_config then
-      vim.lsp.config("*", {
-        capabilities = capabilities,
-      })
-    end
-
-    -- Only use new LSP config API for neovim 0.10+
-    if not has_lsp_config then
-      return
-    end
+    vim.lsp.config("*", {
+      capabilities = capabilities,
+    })
 
     vim.lsp.config("svelte", {
       on_attach = function(client, bufnr)
