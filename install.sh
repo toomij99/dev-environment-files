@@ -258,7 +258,11 @@ do_install() {
         print_info "Backed up .config/nvim"
     fi
     
-    stow . -t ~
+    rm -f ~/.tmux.conf ~/.zshrc ~/.gitconfig ~/.tmux
+rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux/plugins/tpm 2>/dev/null
+    
+    cd "$DOTFILES_DIR"
+    stow .
     print_success "Dotfiles stowed"
 
     print_header "Configuring Powerlevel10k"
