@@ -39,6 +39,7 @@ return {
         "pyright",
         "eslint",
       },
+      automatic_enable = false,
     })
 
     mason_tool_installer.setup({
