@@ -129,6 +129,88 @@ Personal dotfiles configuration for Zsh, Tmux, Neovim, and Git.
 - **Neovim**: Lua-based configuration with various plugins.
 - **Git**: Basic user configuration.
 
+## Quick Commands
+
+### General
+| Command | Description |
+|---------|-------------|
+| `y` | Open yazi file manager |
+| `vim` | Open neovim |
+| `fk` | Fix last command (thefuck) |
+
+### Neovim - File Explorer
+| Command | Description |
+|---------|-------------|
+| `<leader>ee` | Toggle file explorer |
+| `<leader>ef` | Toggle explorer on current file |
+| `<leader>ec` | Collapse explorer |
+| `<leader>er` | Refresh explorer |
+
+### Neovim - Telescope
+| Command | Description |
+|---------|-------------|
+| `<leader>ff` | Find files |
+| `<leader>fr` | Find recent files |
+| `<leader>fs` | Find string in cwd |
+| `<leader>fc` | Find string under cursor |
+| `<leader>ft` | Find todos |
+| `<leader>fk` | Find keymaps |
+
+### Neovim - LSP
+| Command | Description |
+|---------|-------------|
+| `gd` | Go to definition |
+| `gR` | Show references |
+| `gD` | Go to declaration |
+| `gi` | Show implementations |
+| `gt` | Show type definitions |
+| `K` | Show documentation |
+| `<leader>ca` | Code actions |
+| `<leader>rn` | Smart rename |
+| `<leader>rs` | Restart LSP |
+
+### Neovim - Git
+| Command | Description |
+|---------|-------------|
+| `]h` / `[h` | Next/Prev hunk |
+| `<leader>hs` | Stage hunk |
+| `<leader>hr` | Reset hunk |
+| `<leader>hp` | Preview hunk |
+| `<leader>hd` | Diff this |
+
+### Neovim - Misc
+| Command | Description |
+|---------|-------------|
+| `<leader>r` | Substitute motion |
+| `<leader>rr` | Substitute line |
+| `<leader>wr` | Restore session |
+| `<leader>ws` | Save session |
+| `<leader>l` | Show linting |
+
+### Tmux
+| Command | Description |
+|---------|-------------|
+| `Ctrl-a I` | Install plugins |
+| `Ctrl-a |` | Split horizontal |
+| `Ctrl-a -` | Split vertical |
+| `Ctrl-a h/j/k/l` | Navigate panes |
+| `Ctrl-a r` | Reload config |
+
+### Navigation
+| Command | Description |
+|---------|-------------|
+| `z` + directory | zoxide (cd alternative) |
+| `cdf` | cd to git repo root |
+
+### Update & Fix
+```bash
+# Pull latest dotfiles
+cd ~/.dotfiles && git pull && git submodule update --init --recursive
+
+# Re-stow configurations
+cd ~/.dotfiles && stow .
+```
+
 ## Requirements
 
 - Zsh

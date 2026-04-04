@@ -19,7 +19,7 @@ fi
 export PATH=$HOME/bin:/usr/local/bin:/opt/homebrew/opt:/Library/TeX/texbin$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/tommy/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -117,15 +117,13 @@ source $ZSH/oh-my-zsh.sh
  alias zshconfig="vim ~/.zshrc"
 
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-source /Users/tommy/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+source $ZSH/custom/plugins/zsh-autosuggestions
 
-bindkey "^k" forward-word
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-export PATH="$HOME/Library/Python/3.9/bin:$PATH"
 export PATH="$HOME/Library/Python/3.9/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
@@ -133,7 +131,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/tommy/.docker/completions $fpath)
+fpath=($HOME/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
@@ -177,15 +175,6 @@ export BAT_THEME=tokyonight_night
 # thefuck alias
 eval $(thefuck --alias)
 eval $(thefuck --alias fk)
-
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
