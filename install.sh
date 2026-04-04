@@ -208,6 +208,41 @@ do_install() {
     cd "$DOTFILES_DIR"
     stow .
     print_success "Dotfiles stowed"
+
+    print_info "Setting zsh as default shell..."
+    if [ "$(which zsh)" != "$SHELL" ]; then
+        if command -v chsh &> /dev/null; then
+            if sudo -n chsh -s "$(which zsh)" 2>/dev/null; then
+                sudo chsh -s "$(which zsh)"
+                print_success "Shell changed to zsh"
+            elif chsh -s "$(which zsh)"; then
+                print_success "Shell changed to zsh"
+            else
+                print_warning "Could not change shell. Run: chsh -s \$(which zsh)"
+            fi
+        else
+            print_warning "chsh not available. Run: chsh -s \$(which zsh)"
+        fi
+    else
+        print_info "zsh already default shell"
+    fi
+}
+    print_info "Setting zsh as default shell..."
+    if [ "$(which zsh)" != "$SHELL" ]; then
+        if command -v chsh &> /dev/null; then
+            if sudo -n chsh -s "$(which zsh)" 2>/dev/null; then
+                sudo chsh -s "$(which zsh)"
+            elif chsh -s "$(which zsh)"; then
+                :
+            else
+                print_warning "Could not change shell. Run: chsh -s \$(which zsh)"
+            fi
+        else
+            print_warning "chsh not available. Run: chsh -s \$(which zsh)"
+        fi
+    else
+        print_info "zsh already default shell"
+    fi
 }
 
 do_update() {
