@@ -113,6 +113,8 @@ install_packages_apt() {
         "fd-find"
         "coreutils"
         "jq"
+        "zoxide"
+        "zsh-autosuggestions"
     )
 
     sudo apt-get update
@@ -228,6 +230,15 @@ do_install() {
     install_oh_my_zsh
     install_powerlevel10k
     install_tpm
+    
+    print_info "Installing zsh plugins..."
+    ZSH_CUSTOM="$HOME/.oh-my-zsh/custom/plugins"
+    if [ ! -d "$ZSH_CUSTOM/zsh-autosuggestions" ]; then
+        git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/zsh-autosuggestions"
+    fi
+    if [ ! -d "$ZSH_CUSTOM/zsh-syntax-highlighting" ]; then
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/zsh-syntax-highlighting"
+    fi
 
     print_header "Setting Up Dotfiles"
 
