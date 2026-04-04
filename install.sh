@@ -269,8 +269,8 @@ do_install() {
         print_info "Backed up .config/nvim"
     fi
     
-    rm -f ~/.tmux.conf ~/.zshrc ~/.gitconfig ~/.tmux
-rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux/plugins/tpm 2>/dev/null
+rm -f ~/.tmux.conf ~/.zshrc ~/.gitconfig
+    rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux 2>/dev/null
     
     cd "$DOTFILES_DIR"
     
