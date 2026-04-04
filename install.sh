@@ -324,12 +324,14 @@ rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux/plugins/tpm 2>/dev/null
         print_warning "zsh not found"
     fi
     
-    # Fallback: add exec zsh to bashrc
-    if [ -f "$HOME/.bashrc" ]; then
-        if ! grep -q "exec zsh" "$HOME/.bashrc" 2>/dev/null; then
-            echo "exec zsh -l" >> "$HOME/.bashrc"
-            print_info "Added 'exec zsh' to .bashrc"
-        fi
+    # Fallback: add exec zsh to bashrc/profile
+    if [ -f "$HOME/.bashrc" ] && ! grep -q "exec zsh" "$HOME/.bashrc" 2>/dev/null; then
+        echo "exec zsh -l" >> "$HOME/.bashrc"
+        print_info "Added 'exec zsh' to .bashrc"
+    fi
+    if [ -f "$HOME/.profile" ] && ! grep -q "exec zsh" "$HOME/.profile" 2>/dev/null; then
+        echo "exec zsh -l" >> "$HOME/.profile"
+        print_info "Added 'exec zsh' to .profile"
     fi
 }
 
