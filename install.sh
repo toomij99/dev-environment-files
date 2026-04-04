@@ -74,8 +74,8 @@ install_brew() {
     fi
 }
 
-install_packages() {
-    print_info "Installing packages..."
+install_packages_brew() {
+    print_info "Installing packages via Homebrew..."
 
     BREW_PACKAGES=(
         "zsh"
@@ -94,6 +94,39 @@ install_packages() {
 
     brew install "${BREW_PACKAGES[@]}"
     print_success "Packages installed"
+}
+
+install_packages_apt() {
+    print_info "Installing packages via apt..."
+
+    APT_PACKAGES=(
+        "zsh"
+        "git"
+        "tmux"
+        "neovim"
+        "stow"
+        "fzf"
+        "bat"
+        "fd-find"
+        "coreutils"
+        "jq"
+    )
+
+    sudo apt-get update
+    sudo apt-get install -y "${APT_PACKAGES[@]}"
+
+    print_success "apt packages installed"
+
+    print_info "Installing additional tools via cargo..."
+    if command -v cargo &> /dev/null; then
+        cargo install thefuck yazi zoxide 2>/dev/null || true
+    fi
+
+    print_info "Installing fd (alternative)..."
+    if ! command -v fd &> /dev/null; then
+        curl -Ls https://github.com/sharkdp/fd/releases/download/v8.7.0/fd-v8.7.0-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /tmp
+        sudo mv /tmp/fd-v8.7.0-x86_64-unknown-linux-gnu/fd /usr/local/bin/
+    fi
 }
 
 install_oh_my_zsh() {
@@ -132,11 +165,20 @@ do_install() {
     case "$OS" in
         macos)
             install_brew
-            install_packages
+            install_packages_brew
             ;;
-        linux-apt|linux-dnf|linux-arch)
-            install_brew
-            install_packages
+        linux-apt)
+            if command -v brew &> /dev/null; then
+                print_info "Homebrew detected"
+                install_packages_brew
+            else
+                print_warning "Homebrew not available, using apt..."
+                install_packages_apt
+            fi
+            ;;
+        linux-dnf|linux-arch)
+            install_brew || true
+            install_packages_brew || true
             ;;
         *)
             print_warning "Unknown OS, trying to install packages anyway..."
