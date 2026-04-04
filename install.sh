@@ -262,7 +262,11 @@ do_install() {
 rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux/plugins/tpm 2>/dev/null
     
     cd "$DOTFILES_DIR"
-    stow -v . --ignore='^fzf-git\.sh' --adopt
+    
+    for f in zshrc tmux.conf gitconfig; do
+        ln -sf "$DOTFILES_DIR/$f" "$HOME/.$f"
+    done
+    ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
     print_success "Dotfiles stowed"
 
     print_header "Configuring Powerlevel10k"
