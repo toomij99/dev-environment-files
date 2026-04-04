@@ -3,6 +3,7 @@
 set -e
 
 RETRY_COUNT=0
+ACTION_CHOICE=""
 
 REPO_URL="https://github.com/toomij99/dev-environment-files.git"
 DOTFILES_DIR="$HOME/.dotfiles"
@@ -158,8 +159,38 @@ install_tpm() {
     fi
 }
 
+check_existing_install() {
+    if [ -L "$HOME/.zshrc" ] || [ -L "$HOME/.tmux.conf" ]; then
+        print_warning "Dotfiles already stowed!"
+        print_info "[1] Update dotfiles (pull & re-stow)"
+        print_info "[2] Re-stow only (fix symlinks)"
+        print_info "[3] Fresh install"
+        print_info "Choose [1-3]: "
+        read -r ACTION_CHOICE || ACTION_CHOICE="1"
+        
+        case "$ACTION_CHOICE" in
+            1)
+                do_update
+                exit 0
+                ;;
+            2)
+                do_fix
+                exit 0
+                ;;
+            3)
+                print_info "Running fresh install..."
+                ;;
+            *)
+                print_info "Skipping..."
+                ;;
+        esac
+    fi
+}
+
 do_install() {
     print_header "Installing System Packages"
+
+    check_existing_install
 
     OS=$(detect_os)
     print_info "Detected OS: $OS"
