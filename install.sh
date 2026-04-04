@@ -2,6 +2,8 @@
 
 set -e
 
+RETRY_COUNT=0
+
 REPO_URL="https://github.com/toomij99/dev-environment-files.git"
 DOTFILES_DIR="$HOME/.dotfiles"
 ACTION="install"
@@ -202,7 +204,13 @@ do_install() {
         print_warning "Dotfiles directory already exists, pulling latest..."
         cd "$DOTFILES_DIR" && git pull && git submodule update --init --recursive
     else
+        print_info "Cloning dotfiles..."
         git clone --recurse-submodules "$REPO_URL" "$DOTFILES_DIR"
+    fi
+
+    if ! command -v stow &> /dev/null; then
+        print_info "Installing stow..."
+        sudo apt-get install -y stow
     fi
 
     cd "$DOTFILES_DIR"
@@ -210,21 +218,22 @@ do_install() {
     print_success "Dotfiles stowed"
 
     print_info "Setting zsh as default shell..."
-    if [ "$(which zsh)" != "$SHELL" ]; then
+    ZSH_PATH="$(command -v zsh 2>/dev/null || echo "/usr/bin/zsh")"
+    if [ -x "$ZSH_PATH" ]; then
         if command -v chsh &> /dev/null; then
-            if sudo -n chsh -s "$(which zsh)" 2>/dev/null; then
-                sudo chsh -s "$(which zsh)"
+            if sudo -n chsh -s "$ZSH_PATH" 2>/dev/null; then
+                sudo chsh -s "$ZSH_PATH"
                 print_success "Shell changed to zsh"
-            elif chsh -s "$(which zsh)"; then
+            elif chsh -s "$ZSH_PATH" 2>/dev/null; then
                 print_success "Shell changed to zsh"
             else
-                print_warning "Could not change shell. Run: chsh -s \$(which zsh)"
+                print_warning "Could not change shell. Run: chsh -s $ZSH_PATH"
             fi
         else
-            print_warning "chsh not available. Run: chsh -s \$(which zsh)"
+            print_warning "chsh not available. Run: chsh -s $ZSH_PATH"
         fi
     else
-        print_info "zsh already default shell"
+        print_warning "zsh not found"
     fi
 }
     print_info "Setting zsh as default shell..."
