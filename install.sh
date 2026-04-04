@@ -258,7 +258,7 @@ do_install() {
         print_info "Backed up .config/nvim"
     fi
     
-    stow .
+    stow . -t ~
     print_success "Dotfiles stowed"
 
     print_header "Configuring Powerlevel10k"
