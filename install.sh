@@ -68,6 +68,59 @@ print_warning() {
     echo "  ⚠️  $1"
 }
 
+configure_git() {
+    print_header "Configuring Git"
+    
+    local current_name current_email
+    current_name=$(git config --global user.name 2>/dev/null || echo "")
+    current_email=$(git config --global user.email 2>/dev/null || echo "")
+    
+    if [ -n "$current_name" ] && [ -n "$current_email" ]; then
+        print_info "Git already configured:"
+        echo "      Name: $current_name"
+        echo "      Email: $current_email"
+        print_info "Press Enter to keep current, or enter new values"
+    fi
+    
+    if [ -t 0 ]; then
+        local git_name git_email
+        
+        echo ""
+        if [ -n "$current_name" ]; then
+            printf "  Enter your name [%s]: " "$current_name"
+        else
+            printf "  Enter your name: "
+        fi
+        read -r git_name
+        
+        if [ -n "$git_name" ]; then
+            git config --global user.name "$git_name"
+        elif [ -z "$current_name" ]; then
+            print_warning "Git user.name not set. Run: git config --global user.name 'Your Name'"
+        fi
+        
+        if [ -n "$current_email" ]; then
+            printf "  Enter your email [%s]: " "$current_email"
+        else
+            printf "  Enter your email: "
+        fi
+        read -r git_email
+        
+        if [ -n "$git_email" ]; then
+            git config --global user.email "$git_email"
+        elif [ -z "$current_email" ]; then
+            print_warning "Git user.email not set. Run: git config --global user.email 'your@email.com'"
+        fi
+        
+        if [ -n "$git_name" ] || [ -n "$git_email" ]; then
+            print_success "Git configuration updated"
+        fi
+    else
+        print_info "Run 'git config --global user.name \"Your Name\"' to configure git"
+        print_info "Run 'git config --global user.email \"your@email.com\"' to configure git"
+    fi
+}
+
 install_brew() {
     print_info "Installing Homebrew..."
     if ! command -v brew &> /dev/null; then
@@ -305,6 +358,8 @@ rm -f ~/.tmux.conf ~/.zshrc ~/.gitconfig
         fi
     fi
 
+    configure_git
+
     print_info "Setting zsh as default shell..."
     ZSH_PATH="$(command -v zsh 2>/dev/null || echo "/usr/bin/zsh")"
     if [ -x "$ZSH_PATH" ]; then
@@ -349,10 +404,15 @@ do_update() {
     git pull
     print_info "Updating submodules..."
     git submodule update --init --recursive
-    print_info "Re-stowing configurations..."
-    stow .
+    
+    print_info "Re-linking configurations..."
+    for f in zshrc tmux.conf gitconfig; do
+        ln -sf "$DOTFILES_DIR/$f" "$HOME/.$f"
+    done
+    mkdir -p "$HOME/.config"
+    ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
 
-    print_success "Dotfiles updated and stowed"
+    print_success "Dotfiles updated"
 }
 
 do_fix() {
@@ -365,10 +425,14 @@ do_fix() {
     fi
 
     cd "$DOTFILES_DIR"
-    print_info "Re-stowing configurations..."
-    stow .
+    print_info "Re-linking configurations..."
+    for f in zshrc tmux.conf gitconfig; do
+        ln -sf "$DOTFILES_DIR/$f" "$HOME/.$f"
+    done
+    mkdir -p "$HOME/.config"
+    ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
 
-    print_success "Dotfiles re-stowed"
+    print_success "Dotfiles re-linked"
 }
 
 show_banner() {
@@ -422,8 +486,6 @@ main() {
             echo ""
             echo "    1. Restart your terminal or run: exec zsh"
             echo "    2. Install Tmux plugins: Press Ctrl-a + I"
-            echo "    3. Configure git: git config --global user.name 'Your Name'"
-            echo "    4. Configure git: git config --global user.email 'your@email.com'"
             echo ""
             echo "  ⌨️  Popular Commands:"
             echo ""
