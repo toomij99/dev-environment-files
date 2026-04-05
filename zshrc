@@ -2,6 +2,7 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+export DOTENV_ASK=false
 
 if [ "$TMUX" = "" ]; then
   eval $(ssh-agent -s)
@@ -182,7 +183,9 @@ _fzf_compgen_dir() {
   fd --type=d --hidden --exclude .git . "$1"
 }
 
-source ~/fzf-git.sh/fzf-git.sh
+if [ -f "$HOME/fzf-git.sh/fzf-git.sh" ]; then
+    source ~/fzf-git.sh/fzf-git.sh
+fi
 
 # ----- Bat (better cat) -----
 
