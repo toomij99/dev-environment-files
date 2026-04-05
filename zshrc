@@ -3,6 +3,8 @@
 # confirmations, etc.) must go above this block; everything else may go below.
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 export DOTENV_ASK=false
+export DISABLE_AUTO_UPDATE=true
+export DISABLE_UPDATE_PROMPT=true
 
 if [ "$TMUX" = "" ]; then
   eval $(ssh-agent -s)
@@ -91,7 +93,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose python dotenv aliases alias-finder macos brew command-not-found common-aliases pyenv vscode zsh-autosuggestions zsh-syntax-highlighting web-search)
+plugins=(git docker docker-compose python aliases alias-finder macos brew command-not-found common-aliases pyenv vscode zsh-autosuggestions zsh-syntax-highlighting web-search)
 
 source $ZSH/oh-my-zsh.sh
 
