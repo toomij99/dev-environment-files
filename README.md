@@ -8,17 +8,31 @@ To see icons in tmux/neovim, install a Nerd Font:
 
 **macOS:**
 ```bash
+# Option 1: Via Homebrew
 brew install font-sf-mono
-# Or: brew install --cask font-hack-nerd-font
+
+# Option 2: Hack Nerd Font
+brew install --cask font-hack-nerd-font
 ```
 
 **Linux:**
 ```bash
-# Download: https://www.nerdfonts.com/font-downloads
-# Or: sudo apt install fonts-firacode
+# Option 1: Via apt
+sudo apt install fonts-firacode
+
+# Option 2: Download manually
+# Go to: https://www.nerdfonts.com/font-downloads
 ```
 
-Then set terminal font to the Nerd Font in your terminal settings.
+**Set in iTerm2 (macOS):**
+1. Open iTerm2 → `Preferences` (Cmd+,)
+2. Go to `Profiles` → `Text` tab
+3. Click `Change Font`
+4. Select **Hack Nerd Font** or **SF Mono**
+
+**Set in Tilix/Terminal (Linux):**
+1. Open Preferences → Profile → Custom Font
+2. Select **FiraCode Nerd Font** or **Hack Nerd Font**
 
 ## Quick Install
 
