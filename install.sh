@@ -135,6 +135,7 @@ install_packages_brew() {
 
     BREW_PACKAGES=(
         "zsh"
+        "bash"
         "git"
         "tmux"
         "neovim"
