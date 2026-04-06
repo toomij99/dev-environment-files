@@ -265,11 +265,27 @@ cleanup_temp_files() {
         cleaned=1
     fi
 
+    if [ -d "$HOME/.config/nvim/nvim-linux64" ]; then
+        rm -rf "$HOME/.config/nvim/nvim-linux64"
+        print_info "Removed .config/nvim/nvim-linux64"
+        cleaned=1
+    fi
+
     if [ -d "$HOME/.config/nvim/data" ]; then
         rm -rf "$HOME/.config/nvim/data"
         print_info "Removed .config/nvim/data"
         cleaned=1
     fi
+
+    if [ -f "$HOME/.config/nvim/lazy-lock.json" ]; then
+        rm -f "$HOME/.config/nvim/lazy-lock.json"
+        print_info "Removed lazy-lock.json"
+        cleaned=1
+    fi
+
+    cd "$DOTFILES_DIR"
+    git checkout -- .config/nvim/lazy-lock.json 2>/dev/null || true
+    git checkout -- zshrc 2>/dev/null || true
 
     if [ "$cleaned" -eq 0 ]; then
         print_info "No temp files to clean"

@@ -16,3 +16,7 @@ Thumbs.db
 # Temporary
 *.tmp
 *.swp
+
+# Neovim
+.config/nvim/lazy-lock.json
+.config/nvim/data/
