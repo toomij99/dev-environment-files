@@ -345,6 +345,22 @@ install_packages_apt() {
         cargo install thefuck yazi zoxide 2>/dev/null || true
     fi
 
+    if ! command -v yazi &> /dev/null; then
+        print_info "Installing yazi via binary..."
+        local arch
+        arch=$(uname -m)
+        local arch_pkg="x86_64"
+        if [[ "$arch" == "aarch64" ]]; then
+            arch_pkg="aarch64"
+        fi
+
+        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-linux-${arch_pkg}.tar.gz" | tar xz -C /tmp 2>/dev/null || true
+        if [ -f "/tmp/yazi" ]; then
+            chmod +x /tmp/yazi && sudo mv /tmp/yazi /usr/local/bin/
+            print_success "yazi installed"
+        fi
+    fi
+
     print_info "Installing fd (alternative)..."
     if ! command -v fd &> /dev/null; then
         curl -Ls https://github.com/sharkdp/fd/releases/download/v8.7.0/fd-v8.7.0-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /tmp
