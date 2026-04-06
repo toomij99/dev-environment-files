@@ -351,27 +351,33 @@ install_packages_apt() {
         print_info "Installing yazi via binary..."
         local arch
         arch=$(uname -m)
-        local arch_pkg="x86_64"
+        local arch_pkg="x86_64-unknown-linux-gnu"
         if [[ "$arch" == "aarch64" ]]; then
-            arch_pkg="aarch64"
+            arch_pkg="aarch64-unknown-linux-gnu"
         fi
 
         local tmp_dir="/tmp/yazi-install-$$"
         mkdir -p "$tmp_dir"
         
         print_info "Downloading yazi for ${arch_pkg}..."
-        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-linux-${arch_pkg}.tar.gz" -o "$tmp_dir/yazi.tar.gz" 2>&1 || \
-        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.tar.gz" -o "$tmp_dir/yazi.tar.gz" 2>&1 || true
+        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-${arch_pkg}.zip" -o "$tmp_dir/yazi.zip" 2>&1 || \
+        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.zip" -o "$tmp_dir/yazi.zip" 2>&1 || true
         
-        if [ -f "$tmp_dir/yazi.tar.gz" ]; then
-            tar xzf "$tmp_dir/yazi.tar.gz" -C "$tmp_dir" 2>/dev/null || true
+        if [ -f "$tmp_dir/yazi.zip" ]; then
+            unzip -o "$tmp_dir/yazi.zip" -d "$tmp_dir" 2>/dev/null || true
             
+            local yazi_bin=""
             if [ -f "$tmp_dir/yazi" ]; then
-                chmod +x "$tmp_dir/yazi" && sudo mv "$tmp_dir/yazi" /usr/local/bin/
-                print_success "yazi installed"
-            elif [ -f "$tmp_dir/bin/yazi" ]; then
-                chmod +x "$tmp_dir/bin/yazi" && sudo mv "$tmp_dir/bin/yazi" /usr/local/bin/
-                print_success "yazi installed"
+                yazi_bin="$tmp_dir/yazi"
+            else
+                yazi_bin=$(find "$tmp_dir" -name "yazi" -type f 2>/dev/null | head -1)
+            fi
+            
+            if [ -n "$yazi_bin" ]; then
+                chmod +x "$yazi_bin"
+                mkdir -p "$HOME/.local/bin"
+                mv "$yazi_bin" "$HOME/.local/bin/yazi"
+                print_success "yazi installed to ~/.local/bin"
             else
                 print_warning "yazi binary not found in archive"
             fi
