@@ -578,22 +578,12 @@ do_update() {
 
     local has_changes=$(git status --porcelain | grep -v "^??" | wc -l)
     if [ "$has_changes" -gt 0 ]; then
-        print_info "Stashing local changes..."
-        git stash push -m "Auto-stash before update"
-        local stash_failed=$?
+        print_info "Discarding local changes..."
+        git checkout -- . 2>/dev/null || true
     fi
 
     print_info "Pulling latest changes..."
-    if ! git pull --rebase; then
-        print_warning "Pull failed, restoring stash..."
-        git stash pop 2>/dev/null || true
-        exit 1
-    fi
-
-    if [ "$has_changes" -gt 0 ]; then
-        print_info "Restoring local changes..."
-        git stash pop 2>/dev/null || true
-    fi
+    git pull --rebase
 
     print_info "Updating submodules..."
     git submodule update --init --recursive
