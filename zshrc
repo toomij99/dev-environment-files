@@ -193,9 +193,9 @@ fi
 
 export BAT_THEME=tokyonight_night
 
-# thefuck alias
-eval $(thefuck --alias)
-eval $(thefuck --alias fk)
+# thefuck alias - DISABLED: incompatible with Python 3.12+ (imp module removed)
+# eval $(thefuck --alias)
+# eval $(thefuck --alias fk)
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd

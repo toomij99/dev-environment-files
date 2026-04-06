@@ -19,12 +19,14 @@ usage() {
     echo "    -i, --install    Install dotfiles (default)"
     echo "    -u, --update    Update dotfiles from remote"
     echo "    -f, --fix       Fix/re-stow dotfiles"
+    echo "    -p, --python    Fix Python environment & thefuck"
     echo "    -h, --help     Show this help message"
     echo ""
     echo "  Examples:"
-    echo "    $(basename \"$0\")              # Install"
-    echo "    $(basename \"$0\") --update      # Update"
-    echo "    $(basename \"$0\") --fix       # Fix symlinks"
+    echo "    $(basename "$0")              # Install"
+    echo "    $(basename "$0") --update      # Update"
+    echo "    $(basename "$0") --fix       # Fix symlinks"
+    echo "    $(basename "$0") --python    # Fix Python & thefuck"
     echo ""
     echo "  Install via curl:"
     echo "    curl -sS https://raw.githubusercontent.com/toomij99/dev-environment-files/main/install.sh | bash"
@@ -75,11 +77,15 @@ configure_git() {
     current_name=$(git config --global user.name 2>/dev/null || echo "")
     current_email=$(git config --global user.email 2>/dev/null || echo "")
     
+    echo ""
     if [ -n "$current_name" ] && [ -n "$current_email" ]; then
-        print_info "Git already configured:"
-        echo "      Name: $current_name"
+        print_info "Current Git configuration:"
+        echo "      Name:  $current_name"
         echo "      Email: $current_email"
-        print_info "Press Enter to keep current, or enter new values"
+        echo ""
+        print_info "Press Enter to keep current, or enter new values to update"
+    else
+        print_warning "Git not configured"
     fi
     
     if [ -t 0 ]; then
@@ -87,33 +93,39 @@ configure_git() {
         
         echo ""
         if [ -n "$current_name" ]; then
-            printf "  Enter your name [%s]: " "$current_name"
+            printf "  Name [%s]: " "$current_name"
         else
-            printf "  Enter your name: "
+            printf "  Name: "
         fi
         read -r git_name
         
         if [ -n "$git_name" ]; then
             git config --global user.name "$git_name"
+        elif [ -n "$current_name" ]; then
+            print_info "Keeping: $current_name"
         elif [ -z "$current_name" ]; then
             print_warning "Git user.name not set. Run: git config --global user.name 'Your Name'"
         fi
         
         if [ -n "$current_email" ]; then
-            printf "  Enter your email [%s]: " "$current_email"
+            printf "  Email [%s]: " "$current_email"
         else
-            printf "  Enter your email: "
+            printf "  Email: "
         fi
         read -r git_email
         
         if [ -n "$git_email" ]; then
             git config --global user.email "$git_email"
+        elif [ -n "$current_email" ]; then
+            print_info "Keeping: $current_email"
         elif [ -z "$current_email" ]; then
             print_warning "Git user.email not set. Run: git config --global user.email 'your@email.com'"
         fi
         
         if [ -n "$git_name" ] || [ -n "$git_email" ]; then
             print_success "Git configuration updated"
+        else
+            print_success "Git configuration unchanged"
         fi
     else
         print_info "Run 'git config --global user.name \"Your Name\"' to configure git"
@@ -127,6 +139,135 @@ install_brew() {
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     else
         print_info "Homebrew already installed"
+    fi
+}
+
+install_python() {
+    print_header "Setting Up Python"
+
+    if [[ "$OS" == "macos" ]]; then
+        if command -v pyenv &> /dev/null; then
+            print_info "pyenv detected"
+        else
+            print_info "Installing pyenv via brew..."
+            brew install pyenv
+            brew install pyenv-virtualenv
+        fi
+
+        local current_python
+        current_python=$(pyenv version 2>/dev/null | head -1)
+        print_info "Current Python: $current_python"
+
+        print_info "Checking Python versions available..."
+        pyenv install --list 2>/dev/null | grep -E "^\s+3\.(10|11|12)" | tail -5
+
+        print_info "Enter Python version to install [3.12.0]: "
+        read -r PYTHON_VERSION || PYTHON_VERSION="3.12.0"
+
+        if ! pyenv versions | grep -q "$PYTHON_VERSION"; then
+            print_info "Installing Python $PYTHON_VERSION..."
+            pyenv install "$PYTHON_VERSION"
+        fi
+
+        print_info "Setting global Python to $PYTHON_VERSION..."
+        pyenv global "$PYTHON_VERSION"
+
+        print_info "Rehash to update shims..."
+        pyenv rehash
+
+    elif [[ "$OS" == "linux-apt" ]] || [[ "$OS" == "linux-dnf" ]]; then
+        if command -v pyenv &> /dev/null; then
+            print_info "pyenv detected"
+        else
+            print_info "Installing pyenv..."
+            curl https://pyenv.run | bash
+        fi
+
+        export PATH="$HOME/.pyenv/bin:$HOME/.pyenv/shims:$PATH"
+        local current_python
+        current_python=$(pyenv version 2>/dev/null | head -1 || echo "system")
+        print_info "Current Python: $current_python"
+
+        print_info "Enter Python version to install [3.12.0]: "
+        read -r PYTHON_VERSION || PYTHON_VERSION="3.12.0"
+
+        if ! pyenv versions | grep -q "$PYTHON_VERSION"; then
+            print_info "Installing Python $PYTHON_VERSION (this may take a while)..."
+            pyenv install "$PYTHON_VERSION"
+        fi
+
+        print_info "Setting global Python to $PYTHON_VERSION..."
+        pyenv global "$PYTHON_VERSION"
+        pyenv rehash
+    fi
+
+    print_success "Python setup complete"
+    print_info "Python version: $(python --version)"
+}
+
+fix_thefuck() {
+    print_header "Fixing thefuck"
+
+    if command -v thefuck &> /dev/null; then
+        print_info "thefuck already installed"
+
+        local tf_version
+        tf_version=$(thefuck --version 2>/dev/null | head -1 || echo "unknown")
+        print_info "Version: $tf_version"
+
+        print_info "Testing thefuck..."
+        if eval "$(thefuck --alias)" 2>/dev/null; then
+            print_success "thefuck works correctly"
+        else
+            print_warning "thefuck has issues, attempting to fix..."
+
+            if [[ "$OS" == "macos" ]]; then
+                brew reinstall thefuck
+            else
+                pip install thefuck --upgrade
+            fi
+
+            print_info "Re-enabling thefuck in zshrc..."
+            if grep -q "# thefuck alias" ~/.zshrc; then
+                sed -i.bak 's/# thefuck alias/thefuck alias/' ~/.zshrc
+                sed -i 's/# eval \$(thefuck/eval $(thefuck/' ~/.zshrc
+                sed -i "s/# eval \$(thefuck/eval \$(thefuck/" ~/.zshrc
+                print_success "Updated zshrc"
+            fi
+        fi
+    else
+        print_warning "thefuck not found, installing..."
+
+        if [[ "$OS" == "macos" ]]; then
+            brew install thefuck
+        elif command -v pip &> /dev/null; then
+            pip install thefuck
+        elif command -v cargo &> /dev/null; then
+            cargo install thefuck
+        fi
+    fi
+}
+
+cleanup_pyenv() {
+    print_header "Cleaning up Python Environment"
+
+    if command -v pyenv &> /dev/null; then
+        print_info "Checking for broken pyenv installations..."
+
+        local pyenv_root="${PYENV_ROOT:-$HOME/.pyenv}"
+        if [ -d "$pyenv_root/versions" ]; then
+            for v in "$pyenv_root/versions"/*; do
+                if [ -d "$v" ]; then
+                    local version_name
+                    version_name=$(basename "$v")
+                    if ! python -c "import sys; sys.exit(0)" 2>/dev/null; then
+                        print_warning "Removing broken version: $version_name"
+                        rm -rf "$v"
+                    fi
+                fi
+            done
+        fi
+        print_success "Cleanup complete"
     fi
 }
 
@@ -261,15 +402,18 @@ do_install() {
                 print_info "Homebrew detected"
                 install_packages_brew
             else
-                print_warning "Homebrew not available, using apt..."
-                install_packages_apt
+                print_warning "Homebrew not available, installing..."
+                install_brew
+                install_packages_brew
             fi
             ;;
         linux-dnf|linux-arch)
             if command -v brew &> /dev/null 2>&1; then
                 install_packages_brew
             else
-                print_warning "Using native package manager..."
+                print_warning "Homebrew not available, installing..."
+                install_brew
+                install_packages_brew
             fi
             ;;
         *)
@@ -278,6 +422,11 @@ do_install() {
             install_packages || true
             ;;
     esac
+
+    print_header "Setting Up Python Environment"
+    install_python
+    cleanup_pyenv
+    fix_thefuck
 
     print_header "Installing Oh My Zsh & Themes"
 
@@ -401,8 +550,26 @@ do_update() {
     fi
 
     cd "$DOTFILES_DIR"
+
+    local has_changes=$(git status --porcelain | grep -v "^??" | wc -l)
+    if [ "$has_changes" -gt 0 ]; then
+        print_info "Stashing local changes..."
+        git stash push -m "Auto-stash before update"
+        local stash_failed=$?
+    fi
+
     print_info "Pulling latest changes..."
-    git pull
+    if ! git pull --rebase; then
+        print_warning "Pull failed, restoring stash..."
+        git stash pop 2>/dev/null || true
+        exit 1
+    fi
+
+    if [ "$has_changes" -gt 0 ]; then
+        print_info "Restoring local changes..."
+        git stash pop 2>/dev/null || true
+    fi
+
     print_info "Updating submodules..."
     git submodule update --init --recursive
     
@@ -414,6 +581,10 @@ do_update() {
     ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
 
     print_success "Dotfiles updated"
+
+    print_header "Fixing Python & thefuck"
+    install_python
+    fix_thefuck
 }
 
 do_fix() {
@@ -434,6 +605,10 @@ do_fix() {
     ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
 
     print_success "Dotfiles re-linked"
+
+    print_header "Fixing Python & thefuck"
+    install_python
+    fix_thefuck
 }
 
 show_banner() {
@@ -462,6 +637,10 @@ main() {
                 ;;
             -f|--fix)
                 ACTION="fix"
+                shift
+                ;;
+            -p|--python)
+                ACTION="fix-python"
                 shift
                 ;;
             -h|--help)
@@ -519,6 +698,16 @@ main() {
         fix)
             do_fix
             print_header "Fix Complete"
+            echo ""
+            echo "  ℹ️  Restart your terminal to apply changes"
+            echo ""
+            ;;
+        fix-python)
+            OS=$(detect_os)
+            install_python
+            cleanup_pyenv
+            fix_thefuck
+            print_header "Python Fix Complete"
             echo ""
             echo "  ℹ️  Restart your terminal to apply changes"
             echo ""
