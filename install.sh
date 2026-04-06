@@ -356,11 +356,30 @@ install_packages_apt() {
             arch_pkg="aarch64"
         fi
 
-        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-linux-${arch_pkg}.tar.gz" | tar xz -C /tmp 2>/dev/null || true
-        if [ -f "/tmp/yazi" ]; then
-            chmod +x /tmp/yazi && sudo mv /tmp/yazi /usr/local/bin/
-            print_success "yazi installed"
+        local tmp_dir="/tmp/yazi-install-$$"
+        mkdir -p "$tmp_dir"
+        
+        print_info "Downloading yazi for ${arch_pkg}..."
+        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-linux-${arch_pkg}.tar.gz" -o "$tmp_dir/yazi.tar.gz" 2>&1 || \
+        curl -Ls "https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.tar.gz" -o "$tmp_dir/yazi.tar.gz" 2>&1 || true
+        
+        if [ -f "$tmp_dir/yazi.tar.gz" ]; then
+            tar xzf "$tmp_dir/yazi.tar.gz" -C "$tmp_dir" 2>/dev/null || true
+            
+            if [ -f "$tmp_dir/yazi" ]; then
+                chmod +x "$tmp_dir/yazi" && sudo mv "$tmp_dir/yazi" /usr/local/bin/
+                print_success "yazi installed"
+            elif [ -f "$tmp_dir/bin/yazi" ]; then
+                chmod +x "$tmp_dir/bin/yazi" && sudo mv "$tmp_dir/bin/yazi" /usr/local/bin/
+                print_success "yazi installed"
+            else
+                print_warning "yazi binary not found in archive"
+            fi
+        else
+            print_warning "Failed to download yazi"
         fi
+        
+        rm -rf "$tmp_dir"
     fi
 
     print_info "Installing fd (alternative)..."
