@@ -248,25 +248,32 @@ fix_thefuck() {
     fi
 }
 
-cleanup_pyenv() {
-    print_header "Cleaning up Python Environment"
+cleanup_temp_files() {
+    print_header "Cleaning Up Temp Files"
 
-    if command -v pyenv &> /dev/null; then
-        print_info "Checking for broken pyenv installations..."
+    local cleaned=0
 
-        local pyenv_root="${PYENV_ROOT:-$HOME/.pyenv}"
-        if [ -d "$pyenv_root/versions" ]; then
-            for v in "$pyenv_root/versions"/*; do
-                if [ -d "$v" ]; then
-                    local version_name
-                    version_name=$(basename "$v")
-                    if ! python -c "import sys; sys.exit(0)" 2>/dev/null; then
-                        print_warning "Removing broken version: $version_name"
-                        rm -rf "$v"
-                    fi
-                fi
-            done
-        fi
+    if [ -f "$HOME/nvim-linux64.tar.gz" ]; then
+        rm -f "$HOME/nvim-linux64.tar.gz"
+        print_info "Removed nvim-linux64.tar.gz"
+        cleaned=1
+    fi
+
+    if [ -d "$HOME/.config/nvim/nvim" ]; then
+        rm -rf "$HOME/.config/nvim/nvim"
+        print_info "Removed .config/nvim/nvim"
+        cleaned=1
+    fi
+
+    if [ -d "$HOME/.config/nvim/data" ]; then
+        rm -rf "$HOME/.config/nvim/data"
+        print_info "Removed .config/nvim/data"
+        cleaned=1
+    fi
+
+    if [ "$cleaned" -eq 0 ]; then
+        print_info "No temp files to clean"
+    else
         print_success "Cleanup complete"
     fi
 }
@@ -423,9 +430,11 @@ do_install() {
             ;;
     esac
 
+    cleanup_temp_files
+
     print_header "Setting Up Python Environment"
     install_python
-    cleanup_pyenv
+    cleanup_temp_files
     fix_thefuck
 
     print_header "Installing Oh My Zsh & Themes"
@@ -582,6 +591,8 @@ do_update() {
 
     print_success "Dotfiles updated"
 
+    cleanup_temp_files
+
     print_header "Fixing Python & thefuck"
     install_python
     fix_thefuck
@@ -605,6 +616,8 @@ do_fix() {
     ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
 
     print_success "Dotfiles re-linked"
+
+    cleanup_temp_files
 
     print_header "Fixing Python & thefuck"
     install_python
@@ -705,7 +718,7 @@ main() {
         fix-python)
             OS=$(detect_os)
             install_python
-            cleanup_pyenv
+            cleanup_temp_files
             fix_thefuck
             print_header "Python Fix Complete"
             echo ""
