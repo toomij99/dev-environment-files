@@ -199,10 +199,12 @@ install_python() {
         print_info "Setting global Python to $PYTHON_VERSION..."
         pyenv global "$PYTHON_VERSION"
         pyenv rehash
+
+        export PATH="$HOME/.pyenv/shims:$PATH"
     fi
 
     print_success "Python setup complete"
-    print_info "Python version: $(python --version)"
+    print_info "Python version: $(python --version 2>/dev/null || echo 'Run exec zsh to use')"
 }
 
 fix_thefuck() {
