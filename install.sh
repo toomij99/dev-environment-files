@@ -335,6 +335,7 @@ install_packages_apt() {
         "jq"
         "zoxide"
         "zsh-autosuggestions"
+        "unzip"
     )
 
     sudo apt-get update
