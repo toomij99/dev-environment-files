@@ -295,9 +295,11 @@ cleanup_temp_files() {
         cleaned=1
     fi
 
-    cd "$DOTFILES_DIR"
-    git checkout -- .config/nvim/lazy-lock.json 2>/dev/null || true
-    git checkout -- zshrc 2>/dev/null || true
+    if [ -d "$DOTFILES_DIR" ]; then
+        cd "$DOTFILES_DIR"
+        git checkout -- .config/nvim/lazy-lock.json 2>/dev/null || true
+        git checkout -- zshrc 2>/dev/null || true
+    fi
 
     if [ "$cleaned" -eq 0 ]; then
         print_info "No temp files to clean"
