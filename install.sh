@@ -137,6 +137,14 @@ install_brew() {
     print_info "Installing Homebrew..."
     if ! command -v brew &> /dev/null; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+                eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+            elif [ -d "$HOME/.linuxbrew" ]; then
+                eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+            fi
+        fi
     else
         print_info "Homebrew already installed"
     fi
