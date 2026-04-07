@@ -186,7 +186,9 @@ install_python() {
         pyenv rehash
 
     elif [[ "$OS" == "linux-apt" ]] || [[ "$OS" == "linux-dnf" ]]; then
-        if command -v pyenv &> /dev/null; then
+        if [ -d "$HOME/.pyenv" ]; then
+            print_info "pyenv directory found"
+        elif command -v pyenv &> /dev/null; then
             print_info "pyenv detected"
         else
             print_info "Installing pyenv..."
