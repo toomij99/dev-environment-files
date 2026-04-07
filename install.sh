@@ -436,11 +436,16 @@ install_tpm() {
 }
 
 check_existing_install() {
-    if [ -L "$HOME/.zshrc" ] || [ -L "$HOME/.tmux.conf" ]; then
-        print_warning "Dotfiles already stowed!"
-        print_info "[1] Update dotfiles (pull & re-stow)"
-        print_info "[2] Re-stow only (fix symlinks)"
-        print_info "[3] Fresh install"
+    if [ -d "$DOTFILES_DIR" ]; then
+        print_warning "Dotfiles directory found at $DOTFILES_DIR"
+        if [ -L "$HOME/.zshrc" ] || [ -L "$HOME/.tmux.conf" ]; then
+            print_info "[1] Update dotfiles (pull & re-stow)"
+            print_info "[2] Re-stow only (fix symlinks)"
+        else
+            print_info "[1] Update and link dotfiles"
+            print_info "[2] Link dotfiles only"
+        fi
+        print_info "[3] Fresh install (re-clone)"
         print_info "Choose [1-3]: "
         read -r ACTION_CHOICE || ACTION_CHOICE="1"
         
@@ -455,9 +460,32 @@ check_existing_install() {
                 ;;
             3)
                 print_info "Running fresh install..."
+                rm -rf "$DOTFILES_DIR"
                 ;;
             *)
                 print_info "Skipping..."
+                ;;
+        esac
+    elif [ -L "$HOME/.zshrc" ] || [ -L "$HOME/.tmux.conf" ]; then
+        print_warning "Dotfiles symlinks found but directory missing!"
+        print_info "[1] Clone and re-link"
+        print_info "[2] Remove symlinks and fresh install"
+        print_info "[3] Exit"
+        print_info "Choose [1-3]: "
+        read -r ACTION_CHOICE || ACTION_CHOICE="1"
+        
+        case "$ACTION_CHOICE" in
+            1)
+                ;;
+            2)
+                rm -f "$HOME/.zshrc" "$HOME/.tmux.conf" "$HOME/.gitconfig"
+                rm -rf "$HOME/.config/nvim"
+                ;;
+            3)
+                exit 0
+                ;;
+            *)
+                print_info "Proceeding..."
                 ;;
         esac
     fi
