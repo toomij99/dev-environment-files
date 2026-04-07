@@ -2,9 +2,7 @@
 
 set -e
 
-RETRY_COUNT=0
 ACTION_CHOICE=""
-
 REPO_URL="https://github.com/toomij99/dev-environment-files.git"
 DOTFILES_DIR="$HOME/.dotfiles"
 ACTION="install"
@@ -242,10 +240,9 @@ fix_thefuck() {
             fi
 
             print_info "Re-enabling thefuck in zshrc..."
-            if grep -q "# thefuck alias" ~/.zshrc; then
-                sed -i.bak 's/# thefuck alias/thefuck alias/' ~/.zshrc
-                sed -i 's/# eval \$(thefuck/eval $(thefuck/' ~/.zshrc
-                sed -i "s/# eval \$(thefuck/eval \$(thefuck/" ~/.zshrc
+            if grep -q "# thefuck alias" ~/.zshrc 2>/dev/null; then
+                sed -i'' 's/# thefuck alias/thefuck alias/' ~/.zshrc 2>/dev/null || \
+                sed -i 's/# thefuck alias/thefuck alias/' ~/.zshrc 2>/dev/null || true
                 print_success "Updated zshrc"
             fi
         fi
@@ -558,8 +555,14 @@ do_install() {
             ;;
         *)
             print_warning "Unknown OS, trying to install packages anyway..."
-            install_brew || true
-            install_packages || true
+            if command -v brew &> /dev/null; then
+                install_brew
+                install_packages_brew
+            elif command -v apt-get &> /dev/null; then
+                install_packages_apt
+            else
+                print_warning "No supported package manager found"
+            fi
             ;;
     esac
 
@@ -567,7 +570,6 @@ do_install() {
 
     print_header "Setting Up Python Environment"
     install_python
-    cleanup_temp_files
     fix_thefuck
 
     print_header "Installing Oh My Zsh & Themes"
@@ -597,7 +599,11 @@ do_install() {
 
     if ! command -v stow &> /dev/null; then
         print_info "Installing stow..."
-        sudo apt-get install -y stow
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            brew install stow
+        else
+            sudo apt-get install -y stow 2>/dev/null || sudo dnf install -y stow 2>/dev/null || true
+        fi
     fi
 
     cd "$DOTFILES_DIR"
@@ -614,28 +620,15 @@ do_install() {
         print_info "Backed up .config/nvim"
     fi
     
-rm -f ~/.tmux.conf ~/.zshrc ~/.gitconfig
-    rm -rf ~/.config/nvim ~/.fzf-git.sh ~/.tmux 2>/dev/null
-    
-    cd "$DOTFILES_DIR"
+    rm -f "$HOME/.tmux.conf" "$HOME/.zshrc" "$HOME/.gitconfig"
+    rm -rf "$HOME/.config/nvim" "$HOME/.fzf-git.sh" "$HOME/.tmux" 2>/dev/null
     
     for f in zshrc tmux.conf gitconfig; do
         ln -sf "$DOTFILES_DIR/$f" "$HOME/.$f"
     done
+    mkdir -p "$HOME/.config"
     ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
     print_success "Dotfiles stowed"
-    
-    print_header "Installing Tmux Plugins"
-    if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-        print_info "Installing TPM..."
-        git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    fi
-    
-    # Create simple status bar if theme fails
-    if [ -d "$HOME/.tmux/plugins/tpm" ]; then
-        print_info "Running TPM install in tmux..."
-        # Just load the config, let user press prefix+I manually
-    fi
     
     print_info "For tmux plugins, press: Ctrl-a + I"
 
