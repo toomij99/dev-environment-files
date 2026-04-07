@@ -137,16 +137,18 @@ install_brew() {
     print_info "Installing Homebrew..."
     if ! command -v brew &> /dev/null; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            if [ -d "/home/linuxbrew/.linuxbrew" ]; then
-                eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-            elif [ -d "$HOME/.linuxbrew" ]; then
-                eval "$($HOME/.linuxbrew/bin/brew shellenv)"
-            fi
-        fi
     else
         print_info "Homebrew already installed"
+    fi
+}
+
+setup_brew_path() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        elif [ -d "$HOME/.linuxbrew" ]; then
+            eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+        fi
     fi
 }
 
@@ -475,21 +477,22 @@ do_install() {
         linux-apt)
             if command -v brew &> /dev/null 2>&1; then
                 print_info "Homebrew detected"
-                install_packages_brew
             else
                 print_warning "Homebrew not available, installing..."
                 install_brew
-                install_packages_brew
             fi
+            setup_brew_path
+            install_packages_brew
             ;;
         linux-dnf|linux-arch)
             if command -v brew &> /dev/null 2>&1; then
-                install_packages_brew
+                print_info "Homebrew detected"
             else
                 print_warning "Homebrew not available, installing..."
                 install_brew
-                install_packages_brew
             fi
+            setup_brew_path
+            install_packages_brew
             ;;
         *)
             print_warning "Unknown OS, trying to install packages anyway..."
