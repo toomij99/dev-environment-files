@@ -327,10 +327,16 @@ install_packages_brew() {
         "zoxide"
         "fd"
         "coreutils"
+        "node"
     )
 
     brew install "${BREW_PACKAGES[@]}"
     print_success "Packages installed"
+
+    if ! command -v kilo &> /dev/null; then
+        print_info "Installing kilo CLI..."
+        npm install -g @kilocode/cli 2>/dev/null || true
+    fi
 }
 
 install_packages_apt() {
@@ -363,6 +369,8 @@ install_packages_apt() {
         "libxmlsec1-dev"
         "libffi-dev"
         "liblzma-dev"
+        "nodejs"
+        "npm"
     )
 
     sudo apt-get update
@@ -420,6 +428,15 @@ install_packages_apt() {
     if ! command -v fd &> /dev/null; then
         curl -Ls https://github.com/sharkdp/fd/releases/download/v8.7.0/fd-v8.7.0-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /tmp
         sudo mv /tmp/fd-v8.7.0-x86_64-unknown-linux-gnu/fd /usr/local/bin/
+    fi
+
+    if ! command -v kilo &> /dev/null; then
+        print_info "Installing kilo CLI..."
+        if command -v npm &> /dev/null; then
+            npm install -g @kilocode/cli 2>/dev/null || print_warning "Failed to install kilo CLI"
+        else
+            print_warning "npm not found, skipping kilo CLI"
+        fi
     fi
 }
 
