@@ -534,14 +534,8 @@ do_install() {
             install_packages_brew
             ;;
         linux-apt)
-            if command -v brew &> /dev/null 2>&1; then
-                print_info "Homebrew detected"
-            else
-                print_warning "Homebrew not available, installing..."
-                install_brew
-            fi
-            setup_brew_path
-            install_packages_brew
+            print_info "Using native apt packages (no Homebrew)"
+            install_packages_apt
             ;;
         linux-dnf|linux-arch)
             if command -v brew &> /dev/null 2>&1; then
