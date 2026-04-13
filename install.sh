@@ -701,6 +701,9 @@ do_update() {
 
     print_success "Dotfiles updated"
 
+    # Fix symlink for tmux-tokyo-night plugin after update
+    fix_tmux_plugin_symlink
+
     cleanup_temp_files
 
     print_header "Fixing Python & thefuck"
@@ -724,6 +727,9 @@ do_fix() {
     done
     mkdir -p "$HOME/.config"
     ln -sf "$DOTFILES_DIR/.config/nvim" "$HOME/.config/nvim"
+
+    # Fix symlink for tmux-tokyo-night plugin
+    fix_tmux_plugin_symlink
 
     print_success "Dotfiles re-linked"
 
@@ -788,8 +794,17 @@ main() {
             echo "  📝 Next steps:"
             echo ""
             echo "    1. Restart your terminal or run: exec zsh"
-            echo "    2. Install Tmux plugins: Press Ctrl-a + I"
+            echo "    2. Start tmux: tmux"
+            echo "    3. Install Tmux plugins: Press Ctrl-a + I"
             echo ""
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                local brew_bash="/opt/homebrew/bin/bash"
+                [ ! -x "$brew_bash" ] && brew_bash="/usr/local/bin/bash"
+                if [ -x "$brew_bash" ]; then
+                    echo "  📌 Note: tmux will use bash 5+ (required for Tokyo Night theme)"
+                    echo ""
+                fi
+            fi
             echo "  ⌨️  Popular Commands:"
             echo ""
             echo "    y          Open yazi file manager"
@@ -801,6 +816,7 @@ main() {
             echo "    Ctrl-a |   Split horizontal"
             echo "    Ctrl-a -   Split vertical"
             echo "    Ctrl-a h/j/k/l  Navigate panes"
+            echo "    Ctrl-a I   Install plugins"
             echo ""
             echo "    Neovim:"
             echo "    <leader>ff Find files"
