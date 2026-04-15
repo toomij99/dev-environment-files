@@ -145,7 +145,7 @@ setup_brew_path() {
         if [ -d "/home/linuxbrew/.linuxbrew" ]; then
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         elif [ -d "$HOME/.linuxbrew" ]; then
-            eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+            eval "$("$HOME/.linuxbrew/bin/brew" shellenv)"
         fi
     fi
 }
@@ -292,12 +292,6 @@ cleanup_temp_files() {
         rm -f "$HOME/.config/nvim/lazy-lock.json"
         print_info "Removed lazy-lock.json"
         cleaned=1
-    fi
-
-    if [ -d "$DOTFILES_DIR" ]; then
-        cd "$DOTFILES_DIR"
-        git checkout -- .config/nvim/lazy-lock.json 2>/dev/null || true
-        git checkout -- zshrc 2>/dev/null || true
     fi
 
     if [ "$cleaned" -eq 0 ]; then
@@ -460,7 +454,7 @@ install_tpm() {
     if [ -d "$HOME/.tmux/plugins/tpm" ]; then
         print_info "TPM already installed"
     else
-        git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
     fi
 }
 
@@ -615,7 +609,7 @@ do_install() {
     fi
     
     rm -f "$HOME/.tmux.conf" "$HOME/.zshrc" "$HOME/.gitconfig"
-    rm -rf "$HOME/.config/nvim" "$HOME/.fzf-git.sh" "$HOME/.tmux" 2>/dev/null
+    rm -rf "$HOME/.config/nvim" "$HOME/.fzf-git.sh" 2>/dev/null
     
     for f in zshrc tmux.conf gitconfig; do
         ln -sf "$DOTFILES_DIR/$f" "$HOME/.$f"
@@ -680,10 +674,13 @@ do_update() {
 
     cd "$DOTFILES_DIR"
 
-    local has_changes=$(git status --porcelain | grep -v "^??" | wc -l)
+    local has_changes
+    has_changes=$(git diff --name-only -- . ':(exclude).config/nvim/lazy-lock.json' | wc -l | tr -d ' ')
     if [ "$has_changes" -gt 0 ]; then
-        print_info "Discarding local changes..."
-        git checkout -- . 2>/dev/null || true
+        print_warning "Local changes detected in $DOTFILES_DIR"
+        print_warning "Skipping git pull --rebase to avoid overwriting them"
+        print_info "Commit, stash, or discard changes, then run --update again"
+        return 0
     fi
 
     print_info "Pulling latest changes..."

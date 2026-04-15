@@ -66,7 +66,11 @@ curl -sS https://raw.githubusercontent.com/toomij99/dev-environment-files/main/i
 
 3. Restart terminal.
 
-4. Install Tmux plugins: `Ctrl-a I`
+4. Start tmux.
+
+5. Install tmux plugins with `Ctrl-a I`.
+
+6. Reload tmux config with `Ctrl-a r`.
 
 ## Features
 
@@ -141,6 +145,31 @@ curl -sS https://raw.githubusercontent.com/toomij99/dev-environment-files/main/i
 | `Ctrl-a -` | Split vertical |
 | `Ctrl-a h/j/k/l` | Navigate panes |
 | `Ctrl-a r` | Reload config |
+
+## Tmux Session Persistence
+
+This setup includes `tmux-resurrect` and `tmux-continuum`.
+
+`install.sh` installs TPM, but tmux plugins are installed by TPM from inside a tmux session.
+
+- Start tmux and run `Ctrl-a I` once to install the configured plugins.
+- Reload the config with `Ctrl-a r`, or restart tmux.
+- `tmux-continuum` then autosaves tmux state in the background.
+- To restore a saved session manually, use `prefix + Ctrl-r` from `tmux-resurrect`.
+
+By default, automatic restore is disabled in `tmux.conf`:
+
+```tmux
+set -g @continuum-restore 'off'
+```
+
+To enable automatic restore when tmux starts, change it to:
+
+```tmux
+set -g @continuum-restore 'on'
+```
+
+After changing the setting, reload tmux with `Ctrl-a r`.
 
 ### Navigation
 | Command | Description |

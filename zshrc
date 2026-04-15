@@ -6,12 +6,12 @@ export DOTENV_ASK=false
 export DISABLE_AUTO_UPDATE=true
 export DISABLE_UPDATE_PROMPT=true
 
-if [ "$TMUX" = "" ]; then
-  eval $(ssh-agent -s)
+if [ -z "$TMUX" ]; then
+  eval "$(ssh-agent -s)"
 
-  ls -1 ~/.ssh/id_rsa | while read ff;do
-    ssh-add $ff
-  done
+  if [ -f "$HOME/.ssh/id_rsa" ]; then
+    ssh-add "$HOME/.ssh/id_rsa"
+  fi
 fi
 
 
@@ -21,7 +21,7 @@ fi
 
 # If you come from bash you might have to change your $PATH.
 if command -v brew &> /dev/null; then
-    export PATH=$HOME/bin:/usr/local/bin:$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
+    export PATH="$HOME/bin:/usr/local/bin:$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH"
 fi
 
 # Path to your oh-my-zsh installation.
@@ -95,14 +95,14 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git docker docker-compose python aliases alias-finder macos brew command-not-found common-aliases pyenv vscode zsh-autosuggestions zsh-syntax-highlighting web-search)
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
- export LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
@@ -110,6 +110,10 @@ source $ZSH/oh-my-zsh.sh
 # else
 #   export EDITOR='mvim'
 # fi
+
+export EDITOR='code --wait'
+export VISUAL='code --wait'
+export GIT_EDITOR='code --wait'
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -120,18 +124,9 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
- alias zshconfig="vim ~/.zshrc"
+alias zshconfig="vim ~/.zshrc"
 
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-if [ -f "$ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh" ]; then
-    source $ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
-fi
-
-if [ -f "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-    source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-elif [ -f "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-    source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -146,7 +141,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # Docker CLI completions (optional)
 if [ -d "$HOME/.docker/completions" ]; then
-    fpath=($HOME/.docker/completions $fpath)
+    fpath=("$HOME/.docker/completions" $fpath)
     autoload -Uz compinit
     compinit
 fi
@@ -208,5 +203,3 @@ function y() {
 
 # ---- Zoxide (better cd) ----
 eval "$(zoxide init zsh)"
-
-
